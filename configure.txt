@@ -1,0 +1,21 @@
+- DxWifi Doc -
+
+You could need to install a few other things:
+
+apt-get:
+- libeigen3-dev
+- python-cffi
+- libffi-dev
+- python-pip
+
+Clone: https://github.com/LucaFulchir/libRaptorQ
+
+build/install:
+(see readme in repo) 
+make sure that the .so and .a files end up in your /lib folder
+
+pip install:
+- libraptorq 
+
+test woth the command
+echo "hello" | rq encode
