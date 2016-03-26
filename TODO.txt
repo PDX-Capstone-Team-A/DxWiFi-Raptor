@@ -1,0 +1,28 @@
+TODO / Ideas:
+
+Sender:
+
+- Send a beacon style packet every X packets that contains
+critical data
+ - data_bytes
+ - oti_common
+ - oti_scheme
+
+- all packet will contain a bit on the front that type id's it
+ - 0 = data ("symbols")
+ - 1 = beacon
+ - 2 = beacon + data in payload
+
+
+
+
+Receiver:
+
+Our receiver script will need to collect all packets and turn them into a JSON file with a format Critical data + all symbols.
+
+- multi thread? for concurrent communication with the sat and multiple ground users.
+
+
+OTHERS:
+
+ethtool   - turn off UDP checksum   / We wanna collect malformed packets too
