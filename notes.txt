@@ -1,0 +1,41 @@
+the two parameters (oti common and oti scheme) are unsigned 64 bit integers which are subdivided into smaller integers that contain the valuse
+these are defined as follows and can be extraced using the C++ code below taken from RaptorQ.hpp
+
+        //union OTI_Common_Data {
+        //      uint64_t raw;
+        //      struct {
+        //              uint64_t size:40;
+        //              uint8_t reserved:8;
+        //              uint16_t symbol_size:16;
+        //      };
+        //};
+
+        //union OTI_Scheme_Specific_Data {
+        //      uint32_t raw;
+        //      struct {
+        //              uint8_t source_blocks;
+        //              uint16_t sub_blocks;
+        //              uint8_t alignment;
+        //      };
+        //};
+
+        	const OTI_Common_Data common;
+		const OTI_Scheme_Specific_Data scheme;
+                // see the above commented bitfields for quick reference
+
+                _symbol_size = static_cast<uint16_t> (common);
+                uint16_t tot_sub_blocks = static_cast<uint16_t> (scheme >> 8);
+                _alignment = static_cast<uint8_t> (scheme);
+                _sub_blocks = Impl::Partition (_symbol_size /
+                                                                                                static_cast<uint8_t> (scheme),
+                                                                                                                                tot_sub_blocks);
+                _blocks = static_cast<uint8_t> (scheme >> 24);
+                _size = common >> 24;
+                //      (common >> 24) == total file size
+                if (_size > max_data)
+                        return;
+
+                const uint64_t total_symbols = static_cast<uint64_t> (ceil (
+                                                                _size / static_cast<double> (_symbol_size)));
+
+
