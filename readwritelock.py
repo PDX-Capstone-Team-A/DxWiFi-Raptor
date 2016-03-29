@@ -4,7 +4,7 @@ class ReadWriteLock:
     """ A lock object that allows many simultaneous "read locks", but
     only one "write lock." """
 
-    def _ _init_ _(self):
+    def __init__(self):
         self._read_ready = threading.Condition(threading.Lock(  ))
         self._readers = 0
 
