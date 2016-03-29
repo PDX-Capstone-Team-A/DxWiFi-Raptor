@@ -22,6 +22,7 @@ Our receiver script will need to collect all packets and turn them into a JSON f
 
 - multi thread? for concurrent communication with the sat and multiple ground users.
 
+- figure out optimal threading and locking mechanism
 
 OTHERS:
 
