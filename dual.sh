@@ -38,5 +38,5 @@ iw $devname set bitrates legacy-2.4 1 && sleep 1
 iw phy $2 set rts -1
 
 #this line is new vvv 
-ip route add 224.0.0.0/4 dev wlp4s0 #set the route for multicasting
+ip route add 224.0.0.0/4 dev $devname #set the route for multicasting
 

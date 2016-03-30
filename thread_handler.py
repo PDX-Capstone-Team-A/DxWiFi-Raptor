@@ -61,23 +61,34 @@ class thread_handler:
 
         def worker(self, thread_data):
                 #extract the variables accorinding to the notes.txt file
-                size =  0xFFFFFFFFFF| (thread_data.oti_common >> 24) ###need to make sure that these arnt being cast down to 32 bit integers or we will lose critical data
-                symbol_size = 0xFFFF | thread_data.oti_common
-                total_symbols = math.ceil(size/symbol_size)
+                size =  0xFFFFFFFF & (thread_data.oti_common >> 24) ###need to make sure that these arnt being cast down to 32 bit integers or we will lose critical data
+                symbol_size = 0xFFFF & thread_data.oti_common
+                total_symbols = size // symbol_size
 
                 required_symbols = math.ceil (1.1*total_symbols) #the paper said we need .02% exccess packets but we'll use this for now just to be safe
+		if self.debug_mode:
+			print "creating new thread"
+			print "size = " + str(size)
+			print "symbol size = " + str(symbol_size)
+			print "total_symbols = " + str(total_symbols)
+			print "this thread needs " + str(required_symbols) + " symbols"
+		
+		thread_data.rw_lock.acquire_read()
 		while time.clock() - thread_data.u_clock < self.timeout_interval:
-			thread_data.rw_lock.acquire_read()
 			if len(thread_data.data) >= required_symbols:
 				thread_data.rw_lock.release_read()
 				self.process_data(thread_data)
+				thread_data.rw_lock.acquire_read()
 				break
 			thread_data.rw_lock.release_read()
 			time.sleep(self.update_interval)
+			thread_data.rw_lock.acquire_read()
+			
 
-			thread_data.rw_lock.acquire_write()
-			thread_data.u_clock = time.clock()
-			thread_data.rw_lock.release_write()
+			#thread_data.rw_lock.acquire_write()
+			#thread_data.u_clock = time.clock()
+			#thread_data.rw_lock.release_write()
+		thread_data.rw_lock.release_read()
 		
 		###cleanup routine
 		print "exiting worker thread"
@@ -90,7 +101,7 @@ class thread_handler:
 		#what this does will depend largly on the data, as it currently stands i plan on making this routine call rq decode on the data and printing  it to stdout
 		thread_data.rw_lock.acquire_read()
 		dic = {}
-		dic['data_bytes'] = 0xFFFFFFFFFF| (thread_data.oti_common >> 24) ###need to make sure that these arnt being cast down to 32 bit integers or we will lose critical data
+		dic['data_bytes'] = 0xFFFFFFFFFF & (thread_data.oti_common >> 24) ###need to make sure that these arnt being cast down to 32 bit integers or we will lose critical data
 		dic['oti_common'] = thread_data.oti_common
 		dic['oti_scheme'] = thread_data.oti_scheme
 		dic['symbols'] = thread_data.data
@@ -111,8 +122,8 @@ class thread_handler:
 
 
 
-t_handler = thread_handler()
-t_handler.debug_mode = True
-f = open('testdata.json', 'r')
-t_handler.unit_test(f)
+#t_handler = thread_handler()
+#t_handler.debug_mode = True
+#f = open('testdata.json', 'r')
+#t_handler.unit_test(f)
 

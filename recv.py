@@ -8,7 +8,7 @@ import threading
 import math
 
 import readwritelock
-import thread_handler
+from thread_handler import thread_handler
 
 b64_encode = base64.urlsafe_b64encode
 b64_decode = lambda s:\
@@ -16,6 +16,7 @@ b64_decode = lambda s:\
                 if '-' in s or '_' in s else bytes(s).decode('base64')
 	
 
+debug = True
 def main(args=None, error_func=None):
 	import argparse
 
@@ -30,17 +31,24 @@ def main(args=None, error_func=None):
 	multicast_group = (args.g, args.p)
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sock.bind(multicast_group)
-	group = socket.inet_aton(multicast_group)
+	group = socket.inet_aton(multicast_group[0])
 	mreq = struct.pack('4sL', group, socket.INADDR_ANY)
 	sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 	#initialize a thread_handler object
 	handler = thread_handler()
+	handler.debug_mode = True
 
 	while True:
 		data, address = sock.recvfrom(1024)
 		oti_common, oti_scheme, sym_id, sym = struct.unpack('!iii24s', data)
-		thread_handler.add_item(address, oti_common, oti_scheme, sym_id, sym)
+		if debug:
+			print "oti_common = " + str(oti_common)
+			print "oti_scheme = " + str(oti_scheme)
+			print "sym_id = " + str(sym_id)
+			print "sym = " + str(sym)
+
+		handler.add_item(address, oti_common, oti_scheme, sym_id, sym)
 
 
 main()

@@ -53,7 +53,7 @@ def main(args=None, error_func=None):
 		###TODO: base64 encodings waste 3 bits of entropy per byte. binary encoding scheme will be better but we need to be sure that the socket library supports non-ascii data transfer
 		print(datastring)
 		print (b64_decode(sym))
-		#sock.sendto(data_string, multicast_group)
+		sock.sendto(data_string, multicast_group)
 
 	
 
