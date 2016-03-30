@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 import time
 import socket
 import struct
@@ -37,16 +38,16 @@ def main(args=None, error_func=None):
 
 	#initialize a thread_handler object
 	handler = thread_handler()
-	handler.debug_mode = True
+	#handler.debug_mode = True
 
 	while True:
 		data, address = sock.recvfrom(1024)
-		oti_common, oti_scheme, sym_id, sym = struct.unpack('!iii24s', data)
-		if debug:
-			print "oti_common = " + str(oti_common)
-			print "oti_scheme = " + str(oti_scheme)
-			print "sym_id = " + str(sym_id)
-			print "sym = " + str(sym)
+		oti_common, oti_scheme, sym_id, sym = struct.unpack('!QQQ24s', data)
+		#if debug:
+			#print "oti_common = " + str(oti_common)
+			#print "oti_scheme = " + str(oti_scheme)
+			#print "sym_id = " + str(sym_id)
+			#print "sym = " + str(sym)
 
 		handler.add_item(address, oti_common, oti_scheme, sym_id, sym)
 

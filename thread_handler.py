@@ -65,7 +65,7 @@ class thread_handler:
                 symbol_size = 0xFFFF & thread_data.oti_common
                 total_symbols = math.ceil (size / symbol_size)
 
-                required_symbols = math.ceil (1.1*total_symbols) #the paper said we need .02% exccess packets but we'll use this for now just to be safe
+                required_symbols = math.ceil (1.5*total_symbols) #the paper said we need .02% exccess packets but we'll use this for now just to be safe
 		if self.debug_mode:
 			print "creating new thread"
 			print "size = " + str(size)
@@ -106,6 +106,7 @@ class thread_handler:
 		dic['oti_scheme'] = thread_data.oti_scheme
 		dic['symbols'] = thread_data.data
 		if self.debug_mode:
+			print "sending over " + str(len(thread_data.data)) + " symbols for decoding"
 			print "printing data and forking rq"
 		p = Popen(['rq', 'decode'], stdin=PIPE)
 		p.communicate(input=json.dumps(dic,sort_keys=True, indent=2, separators=(',', ': ')))
