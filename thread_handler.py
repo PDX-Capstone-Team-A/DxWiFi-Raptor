@@ -63,7 +63,7 @@ class thread_handler:
                 #extract the variables accorinding to the notes.txt file
                 size =  0xFFFFFFFF & (thread_data.oti_common >> 24) ###need to make sure that these arnt being cast down to 32 bit integers or we will lose critical data
                 symbol_size = 0xFFFF & thread_data.oti_common
-                total_symbols = size // symbol_size
+                total_symbols = math.ceil (size / symbol_size)
 
                 required_symbols = math.ceil (1.1*total_symbols) #the paper said we need .02% exccess packets but we'll use this for now just to be safe
 		if self.debug_mode:
