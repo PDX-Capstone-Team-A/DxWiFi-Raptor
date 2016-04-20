@@ -26,6 +26,7 @@ def main(args=None, error_func=None):
 	parser.add_argument('-o', nargs='?', help="output file (json format)")
 	parser.add_argument('-p', nargs='?', type=int, default=5005, help="port to send to, default = 5005")
 	parser.add_argument('-g', nargs='?', default ="224.3.29.71", help="multicast group address, default = 224.3.29.71")
+	parser.add_argument('-d', help="debug mode", action='store_true')
 
 	args = parser.parse_args(sys.argv[1:] if args is None else args)
 
@@ -38,6 +39,8 @@ def main(args=None, error_func=None):
 
 	#initialize a thread_handler object
 	handler = thread_handler()
+	if args.d:
+		handler.debug_mode = True
 	#handler.debug_mode = True
 
 	while True:
