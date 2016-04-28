@@ -8,8 +8,8 @@ import base64
 
 b64_encode = base64.urlsafe_b64encode
 b64_decode = lambda s:\
-        base64.urlsafe_b64decode(bytes(s))\
-                if '-' in s or '_' in s else bytes(s).decode('base64')
+		base64.urlsafe_b64decode(bytes(s))\
+			if '-' in s or '_' in s else bytes(s).decode('base64')
 
 def main(args=None, error_func=None):
 	import argparse
@@ -48,9 +48,9 @@ def main(args=None, error_func=None):
 	data = json.loads(data) #load the data from the libraptor rq command
 	oti_common = int(data['oti_common'])
 	oti_scheme = int(data['oti_scheme'])
-
+	
 	for sym_id, sym in data['symbols']:
-		datastring = struct.pack('!iii24s', oti_common, oti_scheme, sym_id, sym.encode('ascii','ignore'))
+		datastring = struct.pack('!QQQ24s', oti_common, oti_scheme, int(sym_id), sym.encode('ascii','ignore'))
 		###TODO: base64 encodings waste 3 bits of entropy per byte. binary encoding scheme will be better but we need to be sure that the socket library supports non-ascii data transfer
 		print(datastring)
 		print (b64_decode(sym))
