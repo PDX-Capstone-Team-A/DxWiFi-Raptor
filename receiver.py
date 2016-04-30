@@ -6,7 +6,7 @@ class receiver:
 	1. It will listen for incoming commands on the specified node
 	2. Execute or deny commands that are received """
 
-	def __init__(self,  port = 5005, exe = False, mc_group = "224.3.29.71", debug = False):
+	def __init__(self,  port = 5005, exe = False, mc_group = "224.3.29.71", debug = False, sender=None):
 		self.blist = []
 		self.exe = exe
 		self.mc_group = (str(mc_group), port)
@@ -16,21 +16,23 @@ class receiver:
 		mreq = struct.pack('4sL', group, socket.INADDR_ANY)
 		self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 		self.debug = debug
+		
+		self.sender_obj = sender
 
 	def start(self, max_messages = -1):
 
-		handler = thread_handler(max_messages, exe = self.exe)
+		handler = thread_handler(max_messages, exe = self.exe, sender=self.sender_obj)
 
 		handler.debug_mode = self.debug
 
 		while True:
 			data, address = self.sock.recvfrom(1024)
 			oti_common, oti_scheme, sym_id, sym = struct.unpack('!QQQ24s', data)
-			#if debug:
-				#print "oti_common = " + str(oti_common)
-				#print "oti_scheme = " + str(oti_scheme)
-				#print "sym_id = " + str(sym_id)
-				#print "sym = " + str(sym)
+			if self.debug:
+				print "oti_common = " + str(oti_common)
+				print "oti_scheme = " + str(oti_scheme)
+				print "sym_id = " + str(sym_id)
+				print "sym = " + str(sym)
 			if not address in self.blist:
 				handler.add_item(address, oti_common, oti_scheme, sym_id, sym)    	
 

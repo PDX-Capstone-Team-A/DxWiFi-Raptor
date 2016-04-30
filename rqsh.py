@@ -22,17 +22,21 @@ def main():
 	args = None
 	args = parser.parse_args(sys.argv[1:] if args is None else args)
 
+	sndr = sender(loss = args.lr, mc_group = args.m, port = args.p, debug = args.d)
+
 	if args.q:
 		recv = receiver(port = args.p, exe = False, mc_group = args.m, debug = args.d)
 		recv.blacklist(socket.gethostbyname(socket.gethostname()))
-		recv.start(max_messages = 1)
+		t_id = threading.Thread(target = recv.start, kwargs = {'max_messages':1})
+		t_id.daemon = True
+		t_id.start()
 
 	elif args.l:
 		recv = receiver(port = args.p, exe = False, mc_group = args.m, debug = args.d)
 		recv.start(max_messages = -1)
 	
 	elif args.x:
-		recv = receiver(port = args.p, exe = True, mc_group = args.m, debug = args.d)
+		recv = receiver(port = args.p, exe = True, mc_group = args.m, debug = args.d, sender=sndr)
 		recv.start(max_messages = -1)
 	
 	if args.q or args.s:
@@ -49,7 +53,6 @@ def main():
 		except: pass
 
 
-		sndr = sender(loss = args.lr, mc_group = args.m, port = args.p, debug = args.d)
 		sndr.send(data[:-1])
 
 main()

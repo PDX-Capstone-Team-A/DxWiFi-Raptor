@@ -30,7 +30,8 @@ class thread_handler:
 			self.u_clock = t
 			self.no_exec = exe
 
-	def __init__(self, max_messages, exe = False):
+	def __init__(self, max_messages, exe = False, sender=None):
+		self.sender_obj = sender
 		self.exe = exe
 		self.max_messages = max_messages
 		self.num_messages = 0
@@ -198,6 +199,8 @@ class thread_handler:
 		else:
 			print data
 
+		if sender:
+			sender_obj.send(data)
 		return succ
 
 
