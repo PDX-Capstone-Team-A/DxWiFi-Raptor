@@ -1,4 +1,5 @@
 import time
+import pipes
 import json
 import threading
 import math
@@ -7,7 +8,7 @@ import libraptorq
 import base64
 from libraptorq import RQEncoder, RQDecoder, RQError
 
-#from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE, STDOUT
 
 from readwritelock import ReadWriteLock
 
@@ -20,13 +21,14 @@ b64_decode = lambda s:\
 # thread handler will be a class that groups the symbols and then attempts to decode them
 class thread_handler:
 	class thread_data:
-		def __init__(self, o_common, o_scheme, addr, lst, lock, t):
+		def __init__(self, o_common, o_scheme, addr, lst, lock, t, exe=False):
 			self.address = addr
 			self.oti_common = o_common
 			self.oti_scheme = o_scheme
 			self.data = lst
 			self.rw_lock = lock
 			self.u_clock = t
+			self.no_exec = exe
 
 	def __init__(self, max_messages, exe = False):
 		self.exe = exe
@@ -93,7 +95,7 @@ class thread_handler:
 		thread_data.rw_lock.acquire_read()
 		while time.time() - thread_data.u_clock < self.timeout_interval:
 			self.rw_lock.acquire_read()
-			if self.num_messages >= max_messages and max_messages >= 0: #break if max messages excited
+			if self.num_messages >= self.max_messages and self.max_messages >= 0: #break if max messages excited
 				break
 			self.rw_lock.release_read()
 
@@ -112,7 +114,7 @@ class thread_handler:
 				self.rw_lock.acquire_write()
 				self.num_messages += 1 
 
-				self.release_write()
+				self.rw_lock.release_write()
 				break
 			thread_data.rw_lock.release_read()
 			time.sleep(self.update_interval)
@@ -164,9 +166,9 @@ class thread_handler:
 				else:
 					succ = True
 					break
-				else:
-					if self.debug_mode:
-						print 'Faled to decode data from ' + str(n_syms_total) + ' symbols'
+			else:
+				if self.debug_mode:
+					print 'Faled to decode data from ' + str(n_syms_total) + ' symbols'
 
 
 		thread_data.rw_lock.release_read()
@@ -179,15 +181,15 @@ class thread_handler:
 		# 		print "failed to decode"
 		if self.exe:
 			cmd = data.split('\n', 1)[0]
-			cmd = pipes.quote(cmd) #santize input
+			#cmd = pipes.quote(cmd) #santize input
+			cmd = str(cmd).strip('\0')
+			#print ":".join("{:02x}".format(ord(c)) for c in cmd)
 			try: stdin_data = data.split('\n', 1)[1]
 			except: stdin_data = ''
-			if not no_exec:
-				p = Popen(cmd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
-				p.communicate(stdin_data)
+			if self.exe:
+				p = Popen(str(cmd.strip()), stdout=PIPE, stderr=PIPE, stdin=PIPE)
+				stdout_data, stderr_data = p.communicate(stdin_data)
 				p.wait()
-				stdout_data = p.stdout.read()
-				stderr_data = p.stderr.read()
 				return_code = p.returncode
 				return (stdout_data,stderr_data,return_code)
 			else:

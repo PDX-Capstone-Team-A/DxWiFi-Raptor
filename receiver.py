@@ -20,12 +20,11 @@ class receiver:
 	def start(self, max_messages = -1):
 
 		handler = thread_handler(max_messages, exe = self.exe)
-		if debug:
-			handler.debug_mode = True
-		#handler.debug_mode = True
+
+		handler.debug_mode = self.debug
 
 		while True:
-			data, address = sock.recvfrom(1024)
+			data, address = self.sock.recvfrom(1024)
 			oti_common, oti_scheme, sym_id, sym = struct.unpack('!QQQ24s', data)
 			#if debug:
 				#print "oti_common = " + str(oti_common)
