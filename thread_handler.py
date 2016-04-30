@@ -171,8 +171,9 @@ class thread_handler:
 				if self.debug_mode:
 					print 'Faled to decode data from ' + str(n_syms_total) + ' symbols'
 
-
 		thread_data.rw_lock.release_read()
+		if not succ:
+			return False
 		#p.poll()
 		# if self.debug_mode:
 		# 	if succ:
