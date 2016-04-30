@@ -6,7 +6,7 @@ class receiver:
 	1. It will listen for incoming commands on the specified node
 	2. Execute or deny commands that are received """
 
-	def __init__(self,  port = 5005, exe = False, mc_group = "224.3.29.71", debug = False, sender=None):
+	def __init__(self,  port = 5005, exe = False, mc_group = "224.3.29.71", debug = False, sndr=None):
 		self.blist = []
 		self.exe = exe
 		self.mc_group = (str(mc_group), port)
@@ -17,11 +17,11 @@ class receiver:
 		self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 		self.debug = debug
 		
-		self.sender_obj = sender
+		self.sender_obj = sndr
 
 	def start(self, max_messages = -1):
 
-		handler = thread_handler(max_messages, exe = self.exe, sender=self.sender_obj)
+		handler = thread_handler(max_messages, exe = self.exe, sndr=self.sender_obj)
 
 		handler.debug_mode = self.debug
 

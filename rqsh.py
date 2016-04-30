@@ -1,5 +1,6 @@
 #!/usr/bin/python2
 
+import threading
 import argparse
 import socket
 import sys
@@ -36,7 +37,7 @@ def main():
 		recv.start(max_messages = -1)
 	
 	elif args.x:
-		recv = receiver(port = args.p, exe = True, mc_group = args.m, debug = args.d, sender=sndr)
+		recv = receiver(port = args.p, exe = True, mc_group = args.m, debug = args.d, sndr=sndr)
 		recv.start(max_messages = -1)
 	
 	if args.q or args.s:

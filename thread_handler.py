@@ -30,8 +30,8 @@ class thread_handler:
 			self.u_clock = t
 			self.no_exec = exe
 
-	def __init__(self, max_messages, exe = False, sender=None):
-		self.sender_obj = sender
+	def __init__(self, max_messages, exe = False, sndr=None):
+		self.sender_obj = sndr
 		self.exe = exe
 		self.max_messages = max_messages
 		self.num_messages = 0
@@ -180,6 +180,7 @@ class thread_handler:
 		# 		print data
 		# 	else:
 		# 		print "failed to decode"
+		stdout_data = ''
 		if self.exe:
 			cmd = data.split('\n', 1)[0]
 			#cmd = pipes.quote(cmd) #santize input
@@ -192,15 +193,22 @@ class thread_handler:
 				stdout_data, stderr_data = p.communicate(stdin_data)
 				p.wait()
 				return_code = p.returncode
-				return (stdout_data,stderr_data,return_code)
+				if self.debug_mode:
+					print stdout_data
+				#return (stdout_data,stderr_data,return_code)
 			else:
-				print cmd
-				print stdin_data
+				if self.debug_mode:
+					print cmd
+					print stdin_data
 		else:
-			print data
+				print data
 
-		if sender:
-			sender_obj.send(data)
+		if self.debug_mode:
+			print data
+		if self.sender_obj:
+			if self.debug_mode:
+				print 'sending data'
+			self.sender_obj.send(stdout_data)
 		return succ
 
 
