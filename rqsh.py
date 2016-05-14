@@ -69,5 +69,7 @@ def main():
 
 
 		sndr.send(data[:-1])
-
+	
+	if args.x:
+		input() #wait for all threads to finish
 main()
