@@ -1,5 +1,9 @@
 TODO / Ideas:
 
+feauture: send files
+fix argument parser for commands
+more testing
+
 Sender:
 
 - Send a beacon style packet every X packets that contains
