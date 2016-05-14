@@ -1,6 +1,0 @@
-possible 32-64 bit error
-
-things to consider:
-missing incoming packets in decode call due to lock. fix via deepcopy? no fix via buffer
-packet verification/hash -not drop corrupted packets soemhow?
-

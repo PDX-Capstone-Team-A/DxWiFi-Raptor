@@ -18,12 +18,20 @@ critical data
 
 Receiver:
 
-Our receiver script will need to collect all packets and turn them into a JSON file with a format Critical data + all symbols.
 
-- multi thread? for concurrent communication with the sat and multiple ground users.
 
-- figure out optimal threading and locking mechanism
 
 OTHERS:
 
 ethtool   - turn off UDP checksum   / We wanna collect malformed packets too
+
+
+
+Bugs:
+
+possible 32-64 bit error
+
+things to consider:
+missing incoming packets in decode call due to lock. fix via deepcopy? no fix via buffer
+packet verification/hash -not drop corrupted packets soemhow?
+
