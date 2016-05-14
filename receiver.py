@@ -28,12 +28,14 @@ class receiver:
 		while True:
 			data, address = self.sock.recvfrom(1024)
 			oti_common, oti_scheme, sym_id, sym = struct.unpack('!QQQ24s', data)
-			if self.debug:
-				print "oti_common = " + str(oti_common)
-				print "oti_scheme = " + str(oti_scheme)
-				print "sym_id = " + str(sym_id)
-				print "sym = " + str(sym)
-			if not address in self.blist:
+			if not address[0] in self.blist:
+				if self.debug:
+					print "oti_common = " + str(oti_common)
+					print "oti_scheme = " + str(oti_scheme)
+					print "sym_id = " + str(sym_id)
+					print "sym = " + str(sym)
+					print address
+					print str(self.blist)
 				handler.add_item(address, oti_common, oti_scheme, sym_id, sym)    	
 
 	def blacklist(self, ip):

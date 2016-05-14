@@ -38,6 +38,7 @@ def main():
 	
 	elif args.x:
 		recv = receiver(port = args.p, exe = True, mc_group = args.m, debug = args.d, sndr=sndr)
+		recv.blacklist(socket.gethostbyname(socket.gethostname()))
 		recv.start(max_messages = -1)
 	
 	if args.q or args.s:

@@ -29,6 +29,8 @@ class thread_handler:
 			self.rw_lock = lock
 			self.u_clock = t
 			self.no_exec = exe
+			self.zombie = False
+			
 
 	def __init__(self, max_messages, exe = False, sndr=None):
 		self.sender_obj = sndr
@@ -67,7 +69,7 @@ class thread_handler:
 
 			t_id.start()
 
-		else: #otherwise we need to figure out which thread is working on this block and add this to it's data list
+		elif not self.threads[(address, oti_common, oti_scheme)].zombie : #otherwise we need to figure out which thread is working on this block and add this to it's data list
 			thread_item = self.threads [(address, oti_common, oti_scheme)]
 			self.rw_lock.release_read()
 			thread_item.rw_lock.acquire_write()
@@ -114,7 +116,7 @@ class thread_handler:
 					continue
 				self.rw_lock.acquire_write()
 				self.num_messages += 1 
-
+				thread_data.zombie = True
 				self.rw_lock.release_write()
 				break
 			thread_data.rw_lock.release_read()
@@ -129,6 +131,7 @@ class thread_handler:
 	
 		###cleanup routine
 		print "exiting worker thread"
+		time.sleep(self.update_interval)
 		self.rw_lock.acquire_write()
 		del self.threads[(thread_data.address, thread_data.oti_common, thread_data.oti_scheme)]
 		self.rw_lock.release_write()
@@ -186,7 +189,7 @@ class thread_handler:
 			cmd = data.split('\n', 1)[0]
 			#cmd = pipes.quote(cmd) #santize input
 			cmd = str(cmd).strip('\0')
-			#print ":".join("{:02x}".format(ord(c)) for c in cmd)
+			print ":".join("{:02x}".format(ord(c)) for c in cmd)
 			try: stdin_data = data.split('\n', 1)[1]
 			except: stdin_data = ''
 			if self.exe:
