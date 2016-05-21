@@ -188,12 +188,12 @@ class thread_handler:
 		if self.exe:
 			cmd = data.split('\n', 1)[0]
 			#cmd = pipes.quote(cmd) #santize input
-			cmd = str(cmd).strip('\0')
+			cmd = str(cmd).strip('\0').strip.split()
 			print ":".join("{:02x}".format(ord(c)) for c in cmd)
 			try: stdin_data = data.split('\n', 1)[1]
 			except: stdin_data = ''
 			if self.exe:
-				p = Popen(str(cmd.strip()), stdout=PIPE, stderr=PIPE, stdin=PIPE)
+				p = Popen(cmd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
 				stdout_data, stderr_data = p.communicate(stdin_data)
 				p.wait()
 				return_code = p.returncode
