@@ -32,7 +32,7 @@ class thread_handler:
 			self.zombie = False
 			
 
-	def __init__(self, max_messages, exe = False, sndr=None):
+	def __init__(self, max_messages, exe = False, sndr=None, delim='#'):
 		self.sender_obj = sndr
 		self.exe = exe
 		self.max_messages = max_messages
@@ -42,6 +42,7 @@ class thread_handler:
 		self.timeout_interval = 5.0 #time in seconds to kill thread if no new data has been recieved
 		self.update_interval = 0.2 #update interval (secs) should be tuned to the expected number of simultaneous conncetions, higher = better performance with more users, lower = better with less
 		self.debug_mode = False
+		self.delim = delim
 
 	def add_item(self, address, oti_common, oti_scheme, sym_id, sym):
 		if self.debug_mode:
@@ -148,8 +149,6 @@ class thread_handler:
 		if self.debug_mode:
 			print "sending over " + str(len(thread_data.data)) + " symbols for decoding"
 			print "printing data and forking rq"
-			#p = Popen(['rq', 'decode'], stdin=PIPE)
-			#p.communicate(input=json.dumps(dic,sort_keys=True, indent=2, separators=(',', ': ')))
 			
 		n_syms, n_syms_total, n_sym_bytes = 0, len(data['symbols']), 0
 		data_len = data['data_bytes']
@@ -177,19 +176,63 @@ class thread_handler:
 		thread_data.rw_lock.release_read()
 		if not succ:
 			return False
-		#p.poll()
-		# if self.debug_mode:
-		# 	if succ:
-		# 		print "successfully decodeded"
-		# 		print data
-		# 	else:
-		# 		print "failed to decode"
+		if self.debug_mode:
+		 	if succ:
+		 		print "successfully decodeded"
+		 		print data
+		 	else:
+		 		print "failed to decode"
+
 		stdout_data = ''
+
+		#Parse command type according to:
+
+        #Data header types
+        #0 = plaintext dump/command response
+        #1 = command
+        #2 = request file
+        #3 = file dump/file response
+
+        #data header syntax
+        # 0: [header (this number)]\d[text size]\d[text]
+        # 1: [header]\d[command]
+        # 2: [header]\d[host_ip]\d[host_file]\d[local_file]
+        # 3: [header]\d[dest_file aka host_file]\d[payload_size]\d[payload]
+
+		header = data.split(self.delim)[0]
+		#Note, these files are reverse because WE are the server
+		host_file = None #our file
+		local_file = None #local to the requester
+		payload = None
+		size = None #payload or text sizei
+		host_ip = None #our ip?
+		text = None
+
+		if self.header == '0':
+			size = int (data.split(self.delim)[1])
+			text = data[:-size] #dont use split in case payload uses the delimiter for whatever reason
+			
+		elif self.header == '1':
+			text = data.split(self.delim)[1]
+			
+		elif self.header == '2':
+			host_ip = data.split(self.delim)[1]
+			host_file = data.split(self.delim)[2]
+			local_file = data.split(self.delim)[3]
+			
+		elif self.header == '2':
+			host_file = data.split(self.delim)[1]
+			size = int (data.split(self.delim)[2])
+			payload = data[:-size] #dont use split in case payload uses the delimiter for whatever reason
+
+		#TODO figure out what to do with these variables. all the code below this point is for an older protocol and will not work. must fix 
+		
+		
 		if self.exe:
 			cmd = data.split('\n', 1)[0]
-			#cmd = pipes.quote(cmd) #santize input
 			cmd = str(cmd).strip('\0').strip().split()
-			#print ":".join("{:02x}".format(ord(c)) for c in cmd)
+			if self.debug_mode:
+				print ":".join("{:02x}".format(ord(c)) for c in cmd)
 			try: stdin_data = data.split('\n', 1)[1]
 			except: stdin_data = ''
 			if self.exe:
@@ -199,7 +242,6 @@ class thread_handler:
 				return_code = p.returncode
 				if self.debug_mode:
 					print stdout_data
-				#return (stdout_data,stderr_data,return_code)
 			else:
 				if self.debug_mode:
 					print cmd
@@ -214,7 +256,6 @@ class thread_handler:
 				print 'sending data'
 			self.sender_obj.send(stdout_data)
 		return succ
-
 
 	def unit_test(self, infile):
 		data = json.loads(infile.read())
