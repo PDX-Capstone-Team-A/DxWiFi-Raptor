@@ -6,6 +6,7 @@ import math
 import os
 import libraptorq
 import base64
+import string
 from libraptorq import RQEncoder, RQDecoder, RQError
 
 from subprocess import Popen, PIPE, STDOUT
@@ -207,7 +208,7 @@ class thread_handler:
 		size = None #payload or text sizei
 		host_ip = None #our ip?
 		text = None
-
+		data = data.strip('/0')
 		if header == '0':
 			size = int (data.split(self.delim)[1])
 			text = data[:-size] #dont use split in case payload uses the delimiter for whatever reason
@@ -223,7 +224,7 @@ class thread_handler:
 		elif header == '3':
 			host_file = data.split(self.delim)[1]
 			size = int (data.split(self.delim)[2])
-			payload = data[:-size] #dont use split in case payload uses the delimiter for whatever reason
+			payload = data[-size:] #dont use split in case payload uses the delimiter for whatever reason
 
 		#TODO figure out what to do with these variables. all the code below this point is for an older protocol and will not work. must fix 
 		
@@ -268,8 +269,8 @@ class thread_handler:
 			
 			elif header == '3':
 				try:
-					f = open(host_file, 'w')#not really host file
-					f.write(payload)
+					f = open(host_file.strip('\0'), 'wb')#not really host file
+					f.write(payload)		
 					f.close()
 				except:
 					print 'error, unable to open local file: ' + host_file
