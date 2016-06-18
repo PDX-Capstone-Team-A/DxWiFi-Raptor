@@ -83,8 +83,14 @@ def main():
 		recv.start(max_messages = -1)
 
 	elif args.g: #get file
-		#TODO open quicksend style listener
 		#also TODO build a file only mode
+		
+		recv = receiver(port = args.p, exe = True, mc_group = args.m, debug = args.d)
+		recv.blacklist(my_ip)
+		t_id = threading.Thread(target = recv.start, kwargs = {'max_messages':1})
+		t_id.daemon = True
+		t_id.start()
+
 		data_header = 2
 		if len(args.g) < 1:
 			print 'give arguments to -g please!'
@@ -92,7 +98,7 @@ def main():
 		try:
 			host_ip = args.g[0].split(':')[0]
 			host_file = args.g[0].split(':')[1]
-			if len(args) > 1:
+			if len(args.g) > 1:
 				local_file = args.g[1]
 			else:
 				local_file = os.path.join(os.getcwd(), os.path.split(host_file)[1])
@@ -158,7 +164,7 @@ def main():
 
 	sndr.send(data[:-1])
 	
-	if args.q:
+	if args.q or args.g:
 		input() #wait for all threads to finish
 
 main()
