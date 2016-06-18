@@ -250,21 +250,22 @@ class thread_handler:
 					if self.debug_mode:
 						print cmd
 						print stdin_data
-				response = '0' + self.delim + stdout_data
-				sender_obj.send(response)
+				response = '0' + self.delim + str(size) + self.delim + stdout_data
+				self.sender_obj.send(response)
 			
-			elif header == '2' and host_ip == sender_obj.my_ip:
+			elif header == '2' and host_ip == self.sender_obj.my_ip:
 				#[header]\d[dest_file aka host_file]\d[payload_size]\d[payload]
 				try:
 					f = open(host_file)
 					to_send_data = f.read()
 					send_str = '3' + self.delim + local_file + self.delim + str(len(to_send_data)) + \
 						self.delim + to_send_data
-					sender_obj.send(send_str)
+					self.sender_obj.send(send_str)
 					f.close()
 				except:
-					send_str = '0' + self.delim + 'error, unable to open file: ' + host_file
-					sender_obj.send(send_str)
+					error_msg = 'error, unable to open file: ' + host_file
+					send_str = '0' + self.delim + str(len(error_msg)) + self.delim + error_msg
+					self.sender_obj.send(send_str)
 			
 			elif header == '3':
 				try:
