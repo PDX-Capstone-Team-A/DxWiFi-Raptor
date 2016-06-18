@@ -41,8 +41,6 @@ def main():
 	args = None
 	args = parser.parse_args(sys.argv[1:] if args is None else args)
 
-	sndr = sender(loss = args.lr, mc_group = args.m, port = args.p, debug = args.d)
-
 	interfaces = netifaces.interfaces()
 	my_ip = None
 	for i in interfaces:
@@ -53,6 +51,8 @@ def main():
 	if my_ip == None:
 		print 'invalid network interface'
 		exit(1)
+
+	sndr = sender(loss = args.lr, mc_group = args.m, port = args.p, debug = args.d, ip=my_ip)
 
 	#----------------decision tree---------------
 	data_header = 0

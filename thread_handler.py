@@ -208,19 +208,19 @@ class thread_handler:
 		host_ip = None #our ip?
 		text = None
 
-		if self.header == '0':
+		if header == '0':
 			size = int (data.split(self.delim)[1])
 			text = data[:-size] #dont use split in case payload uses the delimiter for whatever reason
 			
-		elif self.header == '1':
+		elif header == '1':
 			text = data.split(self.delim)[1]
 			
-		elif self.header == '2':
+		elif header == '2':
 			host_ip = data.split(self.delim)[1]
 			host_file = data.split(self.delim)[2]
 			local_file = data.split(self.delim)[3]
 			
-		elif self.header == '2':
+		elif header == '3':
 			host_file = data.split(self.delim)[1]
 			size = int (data.split(self.delim)[2])
 			payload = data[:-size] #dont use split in case payload uses the delimiter for whatever reason
@@ -229,32 +229,69 @@ class thread_handler:
 		
 		
 		if self.exe:
-			cmd = data.split('\n', 1)[0]
-			cmd = str(cmd).strip('\0').strip().split()
-			if self.debug_mode:
-				print ":".join("{:02x}".format(ord(c)) for c in cmd)
-			try: stdin_data = data.split('\n', 1)[1]
-			except: stdin_data = ''
-			if self.exe:
-				p = Popen(cmd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
-				stdout_data, stderr_data = p.communicate(stdin_data)
-				p.wait()
-				return_code = p.returncode
+			if header == '0':
+				print text
+			elif header == '1':
+				#run command
+				cmd = text.split('\n', 1)[0]
+				cmd = str(cmd).strip('\0').strip().split()
 				if self.debug_mode:
-					print stdout_data
-			else:
-				if self.debug_mode:
-					print cmd
-					print stdin_data
+					print ":".join("{:02x}".format(ord(c)) for c in cmd)
+				try: stdin_data = text.split('\n', 1)[1]
+				except: stdin_data = ''
+				if self.exe:
+					p = Popen(cmd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
+					stdout_data, stderr_data = p.communicate(stdin_data)
+					p.wait()
+					return_code = p.returncode
+					if self.debug_mode:
+						print stdout_data
+				else:
+					if self.debug_mode:
+						print cmd
+						print stdin_data
+				response = '0' + self.delim + stdout_data
+				sender_obj.send(response)
+			
+			elif header == '2' and host_ip == sender_obj.my_ip:
+				#[header]\d[dest_file aka host_file]\d[payload_size]\d[payload]
+				try:
+					f = open(host_file)
+					to_send_data = f.read()
+					send_str = '3' + self.delim + local_file + self.delim + str(len(to_send_data)) +
+						self.delim + to_send_data
+					sender_obj.send(send_str)
+					f.close()
+				except:
+					send_str = '0' + self.delim + 'error, unable to open file: ' + host_file
+					sender_obj.send(send_str)
+			
+			elif header == '3':
+				try:
+					f = open(host_file, 'w')#not really host file
+					f.write(payload)
+					f.close()
+				except:
+					print 'error, unable to open local file: ' + host_file
+
 		else:
 				print data
 
 		if self.debug_mode:
-			print data
+			print 'header = ' + header
+			print 'host file =' + host_file
+			print 'local file = ' + local_file
+			print 'size = ' + size
+			print 'host ip = ' + host_ip
+			print 'text = ' + text
+			if payload:
+				print 'payload exists'
+			else:
+				print 'payload is null'
+
 		if self.sender_obj:
 			if self.debug_mode:
 				print 'sending data'
-			self.sender_obj.send(stdout_data)
 		return succ
 
 	def unit_test(self, infile):

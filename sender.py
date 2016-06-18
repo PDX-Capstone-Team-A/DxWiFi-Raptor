@@ -9,7 +9,7 @@ b64_decode = lambda s:\
 class sender:
 	""" Sender - Our sending object, will collect parse and send out information
 	on the desired socket """
-	def __init__(self, loss = 0.0, mc_group = '224.3.29.71', port = 5005, debug = False):
+	def __init__(self, loss = 0.0, mc_group = '224.3.29.71', port = 5005, debug = False, ip = None):
 		self.loss = loss
 		self.io_ratio = 1.0 + loss / (1.0 - loss)
 		self.multicast_group = (mc_group, port)
@@ -23,6 +23,7 @@ class sender:
 		self.max_memory = 200
 		self.threads = 0
 		self.debug = debug
+		self.my_ip = ip
 
 	def send(self, data):
 
