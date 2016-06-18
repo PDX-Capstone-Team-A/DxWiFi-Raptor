@@ -5,8 +5,8 @@ ipaddr=$3
 
 if [ $# -le 1 ]
 then
-	echo "usage: sh dual.sh wifi_device_name physical_device_name ip_address"
-	echo "eg: sudo sh dual.sh wlan0 phy0 10.0.0.8"
+	echo "usage: sh configure_wifi.sh wifi_device_name physical_device_name ip_address"
+	echo "eg: sudo sh configure_wifi.sh wlan0 phy0 10.0.0.8"
 	exit 1
 fi
 

@@ -108,9 +108,9 @@ def main():
 		try:
 			local_file = args.t[0]
 			host_ip = args.t[1].split(':')[0]
-			if len(args.t[1].split(':') > 1:
+			if len(args.t[1].split(':')) > 1:
 				host_file = argt.g[1].split(':')[1]
-			else
+			else:
 				os.path.split(local_file)[1]
 		except:
 			print 'invalid syntax to -t'

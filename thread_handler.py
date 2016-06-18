@@ -258,7 +258,7 @@ class thread_handler:
 				try:
 					f = open(host_file)
 					to_send_data = f.read()
-					send_str = '3' + self.delim + local_file + self.delim + str(len(to_send_data)) +
+					send_str = '3' + self.delim + local_file + self.delim + str(len(to_send_data)) + \
 						self.delim + to_send_data
 					sender_obj.send(send_str)
 					f.close()
