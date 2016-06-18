@@ -129,11 +129,11 @@ def main():
 		# 2: [header]\d[host_ip]\d[host_file]\d[local_file]
 		# 3: [header]\d[dest_file aka host_file]\d[payload_size]\d[payload]
 	
-		#this front-end only needs to deal with 'sending' types, 1,2,3
-		data = str(data_header) + delim
-
 		#TODO find a better delimeter
 		delim = '#' #delimiter for rqsh syntax 
+		
+		#this front-end only needs to deal with 'sending' types, 1,2,3
+		data = str(data_header) + delim
 
 		if data_header == 2:
 			data += host_ip + delim + host_file + delim + local_file
