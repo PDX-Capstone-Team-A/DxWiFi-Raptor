@@ -235,8 +235,6 @@ class thread_handler:
 				#run command
 				cmd = text.split('\n', 1)[0]
 				cmd = str(cmd).strip('\0').strip().split()
-				if self.debug_mode:
-					print ":".join("{:02x}".format(ord(c)) for c in cmd)
 				try: stdin_data = text.split('\n', 1)[1]
 				except: stdin_data = ''
 				if self.exe:
@@ -250,7 +248,7 @@ class thread_handler:
 					if self.debug_mode:
 						print cmd
 						print stdin_data
-				response = '0' + self.delim + str(size) + self.delim + stdout_data
+				response = '0' + self.delim + str(len(stdout_data)) + self.delim + stdout_data
 				self.sender_obj.send(response)
 			
 			elif header == '2' and host_ip == self.sender_obj.my_ip:
@@ -279,12 +277,18 @@ class thread_handler:
 				print data
 
 		if self.debug_mode:
-			print 'header = ' + header
-			print 'host file =' + host_file
-			print 'local file = ' + local_file
-			print 'size = ' + size
-			print 'host ip = ' + host_ip
-			print 'text = ' + text
+			if header:
+				print 'header = ' + header
+			if host_file:
+				print 'host file =' + host_file
+			if local_file:
+				print 'local file = ' + local_file
+			if size:
+				print 'size = ' + size
+			if host_ip:
+				print 'host ip = ' + host_ip
+			if text:
+				print 'text = ' + text
 			if payload:
 				print 'payload exists'
 			else:
