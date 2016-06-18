@@ -160,9 +160,10 @@ def main():
 			try:
 				for j in args.s:
 					data += j + ' '
+				data = data[:-1]
 			except: pass
 
-	sndr.send(data[:-1])
+	sndr.send(data)
 	
 	if args.q or args.g:
 		input() #wait for all threads to finish

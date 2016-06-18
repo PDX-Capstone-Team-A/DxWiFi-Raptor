@@ -258,6 +258,7 @@ class thread_handler:
 					to_send_data = f.read()
 					send_str = '3' + self.delim + local_file + self.delim + str(len(to_send_data)) + \
 						self.delim + to_send_data
+					#print send_str
 					self.sender_obj.send(send_str)
 					f.close()
 				except:
@@ -284,7 +285,7 @@ class thread_handler:
 			if local_file:
 				print 'local file = ' + local_file
 			if size:
-				print 'size = ' + size
+				print 'size = ' + str(size)
 			if host_ip:
 				print 'host ip = ' + host_ip
 			if text:
