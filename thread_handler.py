@@ -75,6 +75,8 @@ class thread_handler:
 			thread_item = self.threads [(address, oti_common, oti_scheme)]
 			self.rw_lock.release_read()
 			thread_item.rw_lock.acquire_write()
+			if self.debug_mode: 
+				print "Size of data array = " + str(len(thread_item.data)) 	
 			thread_item.data.append([sym_id, sym])
 			thread_item.u_clock = time.time()
 			thread_item.rw_lock.release_write()
