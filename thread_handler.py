@@ -208,7 +208,7 @@ class thread_handler:
 		size = None #payload or text sizei
 		host_ip = None #our ip?
 		text = None
-		data = data.strip('/0')
+		data = data.strip('\0')
 		if header == '0':
 			size = int (data.split(self.delim)[1])
 			text = data[:-size] #dont use split in case payload uses the delimiter for whatever reason

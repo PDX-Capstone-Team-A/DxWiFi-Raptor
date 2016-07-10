@@ -34,7 +34,7 @@ def main():
 		metavar = 'local_file address[:dest]')
 
 	#--------tuning/performance args----------
-	parser.add_argument('-lr', nargs = 1, type = float,
+	parser.add_argument('-lr', nargs = '?', type = float,
 		default = 0.0, help = 'expected lose rate, will calculate the N for encoder')
 
 	#--------------Main-----------------------
