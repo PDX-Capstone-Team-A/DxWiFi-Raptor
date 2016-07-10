@@ -24,11 +24,12 @@ class sender:
 		self.threads = 0
 		self.debug = debug
 		self.my_ip = ip
+		self.packet_size = 16
 
 	def send(self, data):
 
 		data_len = len(data)
-		if data_len % 4: data += '\0' * (4 - data_len % 4)
+		if data_len % self.packet_size: data += '\0' * (self.packet_size - data_len % self.packet_size)
 		with RQEncoder( data,
                        self.min_subsymbol_size, self.symbol_size, self.max_memory ) as enc:
 			oti_scheme, oti_common = enc.oti_scheme, enc.oti_common
